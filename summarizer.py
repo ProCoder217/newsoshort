@@ -16,10 +16,9 @@ from sklearn.decomposition import TruncatedSVD
 from sklearn.linear_model import LogisticRegression
 
 # Ensure the 'punkt' tokenizer is downloaded for NLTK
-try:
-    nltk.data.find('tokenizers/punkt')
-except nltk.downloader.DownloadError:
-    nltk.download('punkt')
+nltk.download('punkt')
+nltk.download("punkt_tab")
+nltk.download("stopwords")
 
 # ==============================================================================
 # --- CONFIGURATION: TAXONOMY (Restored from original file) ---

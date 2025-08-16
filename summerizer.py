@@ -11,7 +11,7 @@ import threading
 import nltk
 from nltk.tokenize import sent_tokenize, word_tokenize
 from nltk.corpus import stopwords
-
+nltk.download('punkt'); nltk.download('stopwords')"
 # scikit-learn
 from sklearn.pipeline import Pipeline
 from sklearn.feature_extraction.text import TfidfVectorizer

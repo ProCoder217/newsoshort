@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>News Feed</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lobster&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <script type="importmap">
+    {
+      "imports": {
+        "lit": "https://unpkg.com/lit@3.1.4/index.js",
+        "lit/": "https://unpkg.com/lit@3.1.4/",
+        "lit-html": "https://unpkg.com/lit-html@3.1.4/lit-html.js",
+        "lit-html/": "https://unpkg.com/lit-html@3.1.4/",
+        "lit-element": "https://unpkg.com/lit-element@4.0.6/lit-element.js",
+        "lit-element/": "https://unpkg.com/lit-element@4.0.6/",
+        "@lit/reactive-element": "https://unpkg.com/@lit/reactive-element@2.0.4/reactive-element.js",
+        "@lit/reactive-element/": "https://unpkg.com/@lit/reactive-element@2.0.4/",
+        "@material/web/": "https://unpkg.com/@material/web@1.5.1/",
+        "@material/material-color-utilities": "https://unpkg.com/@material/material-color-utilities@0.2.7/index.js",
+        "tslib": "https://unpkg.com/tslib@2.6.3/tslib.es6.js"
+      }
+    }
+    </script>
+    <script type="module" src="{{ url_for('static', filename='js/main.js') }}"></script>
+<style>
+  :root {
+    --safe-area-inset-top: env(safe-area-inset-top, 1.5rem);
+    --safe-area-inset-right: env(safe-area-inset-right, 1.5rem);
+    --safe-area-inset-bottom: env(safe-area-inset-bottom, 1.5rem);
+    --safe-area-inset-left: env(safe-area-inset-left, 1.5rem);
+  }
+  
+  @keyframes backgroundZoom { 0% { transform: scale(1.1); } 100% { transform: scale(1.2); } }
+  @keyframes contentFadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes shimmer { 100% { transform: translateX(100%); } }
+
+  body {
+    margin: 0;
+    overflow: hidden;
+    background-color: var(--md-sys-color-background);
+    color: var(--md-sys-color-on-background);
+    font-family: 'Roboto', sans-serif;
+  }
+  #news-container {
+    height: 100vh;
+    width: 100vw;
+    overflow-y: scroll;
+    scroll-snap-type: y mandatory;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  #news-container::-webkit-scrollbar { display: none; }
+
+  .news-slide {
+    height: 100vh; width: 100%; scroll-snap-align: start; position: relative;
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    padding: 2.5rem var(--safe-area-inset-right) 2.5rem var(--safe-area-inset-left);
+    box-sizing: border-box; text-align: center;
+  }
+  .background-image {
+    object-fit: cover; 
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    z-index: -2;
+    filter: blur(8px) brightness(0.5);
+    animation: backgroundZoom 25s ease-in-out infinite alternate;
+  }
+  .scrim-overlay {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    background: linear-gradient(transparent 20%, var(--md-sys-color-background) 50%, transparent 80%);
+    opacity: 0.6;
+    z-index: -1;
+  }
+  .news-content {
+    max-width: 800px; width: 100%; display: flex; flex-direction: column;
+    align-items: center; gap: 1.5rem;
+    animation: contentFadeIn 0.8s 0.2s cubic-bezier(0.25, 1, 0.5, 1) backwards;
+  }
+  .news-content h2 {
+    font-family: 'Lobster', cursive;
+    font-size: clamp(2.2rem, 6vw + 1rem, 3.2rem);
+    font-weight: 400; line-height: 1.2; margin: 0; order: 1;
+  }
+  .news-content md-assist-chip { order: 2; }
+  .news-content p { 
+    font-size: clamp(1.1rem, 2vw + 0.5rem, 1.2rem);
+    line-height: 1.6; margin: 0; order: 3; 
+  }
+  .news-content md-outlined-button { order: 4; margin-top: 1rem; --md-outlined-button-label-text-color: var(--md-sys-color-on-background); --md-outlined-button-outline-color: var(--md-sys-color-outline); }
+
+  /* --- Liquid Glass Effect on Floating UI --- */
+  .back-button, #music-controls, .arrow-button {
+    z-index: 10;
+    --md-icon-button-icon-color: var(--md-sys-color-on-surface);
+    /* Override M3 variable to be semi-transparent */
+    --md-icon-button-container-color: rgba(from var(--md-sys-color-surface-container-high) r g b / 0.6);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(from var(--md-sys-color-outline-variant) r g b / 0.2);
+  }
+
+  .back-button { position: fixed; top: var(--safe-area-inset-top); left: var(--safe-area-inset-left); }
+  #music-controls { position: fixed; top: var(--safe-area-inset-top); right: var(--safe-area-inset-right); }
+
+  #loading-sentinel {
+    width: 100%; scroll-snap-align: start; padding: 2.5rem;
+    box-sizing: border-box; height: 1px; display: flex;
+    justify-content: center; align-items: center;
+  }
+  #loading-sentinel.loading, #loading-sentinel.end { height: 100vh; }
+  
+  .skeleton-card { max-width: 800px; width: 100%; display: flex; flex-direction: column; align-items: center; gap: 1.5rem; }
+  .skeleton { background-color: var(--md-sys-color-surface-container-highest); border-radius: 8px; position: relative; overflow: hidden; }
+  .skeleton::after { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent); transform: translateX(-100%); animation: shimmer 1.5s infinite; }
+  .skeleton.title { width: 80%; height: 3.5rem; margin-bottom: 0.5rem; }
+  .skeleton.chip { width: 120px; height: 2rem; }
+  .skeleton.text { width: 90%; height: 1.2rem; margin-bottom: 0.5rem; }
+  .skeleton.text-2 { width: 70%; height: 1.2rem; }
+  .skeleton.button { width: 180px; height: 3rem; margin-top: 1rem; }
+
+  /* --- Liquid Glass Effect on End-of-Feed Card --- */
+  #end-of-feed {
+    padding: 3rem; border-radius: 28px; max-width: 600px; width: 100%;
+    /* Enhanced glass effect */
+    background-color: rgba(from var(--md-sys-color-surface-container) r g b / 0.7);
+    backdrop-filter: blur(20px); /* Increased blur for prominence */
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(from var(--md-sys-color-outline-variant) r g b / 0.3);
+  }
+  #end-of-feed h3 { font-family: 'Lobster', cursive; font-size: 2.2rem; margin: 0 0 1rem 0; color: var(--md-sys-color-primary); }
+  #end-of-feed p { font-size: 1.1rem; opacity: 0.9; margin: 0 0 2rem 0; }
+  
+  .arrow-button { position: fixed; }
+  .category-switcher { top: 50%; transform: translateY(-50%); }
+  #category-prev { left: 1.5rem; }
+  #category-next { right: 1.5rem; }
+  .slide-nav { right: 1.5rem; display: none; }
+  .slide-nav.show { display: flex; }
+  #slide-nav-up { top: 40%; transform: translateY(-50%); }
+  #slide-nav-down { bottom: 40%; transform: translateY(50%); }
+
+  @media (max-width: 768px) {
+    .news-slide, #loading-sentinel { padding-left: 1.5rem; padding-right: 1.5rem; }
+    .skeleton.title { height: 2.5rem; }
+    .category-switcher, .slide-nav { display: none; }
+  }
+</style>
+
+</head>
+<body data-category="{{ category }}" data-all-categories="{{ all_categories|join(',') }}">
+    <div id="news-container">
+        <div id="loading-sentinel">
+          </div>
+    </div>
+
+    <md-icon-button id="category-prev" class="arrow-button category-switcher">
+        <span class="material-symbols-outlined">arrow_back_ios</span>
+    </md-icon-button>
+    <md-icon-button id="category-next" class="arrow-button category-switcher">
+        <span class="material-symbols-outlined">arrow_forward_ios</span>
+    </md-icon-button>
+    <md-icon-button id="slide-nav-up" class="arrow-button slide-nav">
+        <span class="material-symbols-outlined">keyboard_arrow_up</span>
+    </md-icon-button>
+    <md-icon-button id="slide-nav-down" class="arrow-button slide-nav">
+        <span class="material-symbols-outlined">keyboard_arrow_down</span>
+    </md-icon-button>
+    
+    <md-icon-button href="/" class="back-button">
+        <span class="material-symbols-outlined">home</span>
+    </md-icon-button>
+
+    <div id="music-controls">
+        <md-icon-button id="music-play-button">
+            <span class="material-symbols-outlined">play_arrow</span>
+        </md-icon-button>
+        <md-icon-button id="music-pause-button" style="display:none;">
+            <span class="material-symbols-outlined">pause</span>
+        </md-icon-button>
+    </div>
+    <button id="autoclick-button" style="display:none;"></button>
+</body>
+</html>

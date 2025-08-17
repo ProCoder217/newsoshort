@@ -16,12 +16,13 @@ from sklearn.decomposition import TruncatedSVD
 from sklearn.linear_model import LogisticRegression
 
 # Ensure the 'punkt' tokenizer is downloaded for NLTK
-nltk.download('punkt')
-nltk.download("punkt_tab")
-nltk.download("stopwords")
+try:
+    nltk.data.find('tokenizers/punkt')
+except nltk.downloader.DownloadError:
+    nltk.download('punkt')
 
 # ==============================================================================
-# --- CONFIGURATION: TAXONOMY (Restored from original file) ---
+# --- CONFIGURATION: TAXONOMY ---
 # ==============================================================================
 SUBGENRES: Dict[str, str] = {
     # Politics
@@ -33,14 +34,21 @@ SUBGENRES: Dict[str, str] = {
     # Technology
     "AI": "Technology", "Cybersecurity": "Technology", "Gadgets": "Technology", "Software": "Technology", "Hardware": "Technology",
     "Mobile": "Technology", "Cloud": "Technology", "Social Media": "Technology", "Semiconductors": "Technology", "Enterprise IT": "Technology",
-    # ... (and all other subgenres from your original file)
+    # Science
     "Space": "Science", "Physics": "Science", "Biology": "Science", "Chemistry": "Science", "Research Funding": "Science",
+    # Health
     "Public Health": "Health", "Infectious Disease": "Health", "Mental Health": "Health", "Healthcare Policy": "Health", "Pharma": "Health",
+    # Sports
     "Cricket": "Sports", "Football": "Sports", "Tennis": "Sports", "Hockey": "Sports", "Olympics": "Sports",
+    # Entertainment
     "Bollywood": "Entertainment", "Streaming": "Entertainment", "Television": "Entertainment", "Music": "Entertainment", "Celebrities": "Entertainment",
+    # World
     "Geopolitics": "World", "Conflicts": "World", "Sanctions": "World", "Global Economy": "World", "International Organizations": "World",
+    # India
     "Central Government": "India", "State Politics": "India", "Infrastructure": "India", "Rural Development": "India", "Social Welfare": "India",
+    # Environment
     "Climate Change": "Environment", "Pollution": "Environment", "Wildlife": "Environment", "Renewable Energy": "Environment", "Conservation": "Environment",
+    # Automobile
     "EVs": "Automobile", "Auto Launches": "Automobile", "Motorsports": "Automobile", "Auto Policy": "Automobile", "Auto Supply Chain": "Automobile"
 }
 
@@ -96,7 +104,7 @@ class NewsProcessor:
             "EVs dominate auto launches; motorsports thrive; auto policy impacts supply chain.",
         ]
         labels = [
-            "Regulation", "Diplomacy", "Markets", "M&A", "Mobile", "Cybersecurity", "Cricket", "Box Office",
+            "Regulation", "Diplomacy", "Markets", "M&A", "Mobile", "Cybersecurity", "Cricket", "Bollywood", # Corrected "Box Office" to a valid subgenre
             "Public Health", "Space", "Infrastructure", "Geopolitics", "Climate Change", "EVs",
         ]
         return texts, labels
@@ -115,21 +123,53 @@ class NewsProcessor:
                     clf.fit(texts, labels)
                     self._subgenre_clf = clf
 
-    def summarize(self, text: str, num_sentences: int = 3) -> str:
-        """Generates an extractive summary using sklearn's LSA."""
-        if not text: return ""
-        sentences = sent_tokenize(text)
-        if len(sentences) <= num_sentences: return " ".join(sentences)
+    def summarize(self, text: str, max_words: int = 53) -> str:
+        """
+        Generates an extractive summary using LSA, constrained by a maximum word count.
+        It will add the most important sentences one by one until the next sentence
+        would exceed the max_words limit.
+        """
+        if not text:
+            return ""
         
+        sentences = sent_tokenize(text)
+        
+        # If the original text is already short, return it.
+        if len(text.split()) <= max_words:
+            return text
+
+        # Step 1: Score all sentences using LSA
         tfidf_matrix = self.summarizer_vectorizer.fit_transform(sentences)
         self.summarizer_svd.fit(tfidf_matrix)
         concept_vector = self.summarizer_svd.components_[0]
         
-        sentence_scores = {i: sum(concept_vector[j] * tfidf_matrix[i, j] for j, _ in enumerate(self.summarizer_vectorizer.get_feature_names_out()) if tfidf_matrix[i, j] > 0) for i, _ in enumerate(sentences)}
+        sentence_scores = {
+            i: sum(concept_vector[j] * tfidf_matrix[i, j] 
+                   for j, _ in enumerate(self.summarizer_vectorizer.get_feature_names_out()) 
+                   if tfidf_matrix[i, j] > 0)
+            for i, _ in enumerate(sentences)
+        }
         
-        top_indices = sorted(sentence_scores, key=sentence_scores.get, reverse=True)[:num_sentences]
-        top_indices.sort()
-        return " ".join([sentences[i] for i in top_indices])
+        # Step 2: Sort sentences by score, from most to least important
+        sorted_indices = sorted(sentence_scores, key=sentence_scores.get, reverse=True)
+        
+        # Step 3: Build the summary iteratively based on word count
+        summary_indices = []
+        total_words = 0
+        
+        for index in sorted_indices:
+            sentence_to_add = sentences[index]
+            words_in_sentence = len(sentence_to_add.split())
+            
+            # Check if adding the next most important sentence exceeds the limit
+            if total_words + words_in_sentence <= max_words:
+                summary_indices.append(index)
+                total_words += words_in_sentence
+        
+        # Step 4: Sort the selected sentence indices to maintain original order
+        summary_indices.sort()
+        
+        return " ".join([sentences[i] for i in summary_indices])
 
     def predict_subgenre(self, text: str, main_genre: str) -> str:
         """
@@ -153,11 +193,16 @@ class SummaryResult:
     subgenre: str
 
 def give_summary(news: str, genre: str) -> SummaryResult:
+    """
+    Takes a news article and its main genre, returns a summary, the main genre,
+    and a predicted subgenre.
+    """
     if not isinstance(news, str) or not news.strip():
         return SummaryResult(summary="", main_genre=genre, subgenre=genre)
     
     processor = NewsProcessor()
-    summary_text = processor.summarize(news)
+    summary_text = processor.summarize(news) # This now uses the word-count based summarizer
     subgenre = processor.predict_subgenre(news, genre)
     
     return SummaryResult(summary=summary_text, main_genre=genre, subgenre=subgenre)
+

@@ -3,119 +3,73 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
     <title>NewsOShort (M3)</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Lobster&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
-    
-    <script type="importmap">
-    {
-      "imports": {
-        "lit": "https://unpkg.com/lit@3.1.4/index.js",
-        "lit/": "https://unpkg.com/lit@3.1.4/",
-        "lit-html": "https://unpkg.com/lit-html@3.1.4/lit-html.js",
-        "lit-html/": "https://unpkg.com/lit-html@3.1.4/",
-        "lit-element": "https://unpkg.com/lit-element@4.0.6/lit-element.js",
-        "lit-element/": "https://unpkg.com/lit-element@4.0.6/",
-        "@lit/reactive-element": "https://unpkg.com/@lit/reactive-element@2.0.4/reactive-element.js",
-        "@lit/reactive-element/": "https://unpkg.com/@lit/reactive-element@2.0.4/",
-        "@material/web/": "https://unpkg.com/@material/web@1.5.1/",
-        "@material/material-color-utilities": "https://unpkg.com/@material/material-color-utilities@0.2.7/index.js",
-        "tslib": "https://unpkg.com/tslib@2.6.3/tslib.es6.js"
-      }
-    }
-    </script>
-    
+  <script type="importmap">
+{
+  "imports": {
+    "lit": "https://unpkg.com/lit@3.1.4/index.js",
+    "lit/": "https://unpkg.com/lit@3.1.4/",
+    "lit-html": "https://unpkg.com/lit-html@3.1.4/lit-html.js",
+    "lit-html/": "https://unpkg.com/lit-html@3.1.4/",
+    "lit-element": "https://unpkg.com/lit-element@4.0.6/lit-element.js",
+    "lit-element/": "https://unpkg.com/lit-element@4.0.6/",
+    "@lit/reactive-element": "https://unpkg.com/@lit/reactive-element@2.0.4/reactive-element.js",
+    "@lit/reactive-element/": "https://unpkg.com/@lit/reactive-element@2.0.4/",
+    "@material/web/": "https://unpkg.com/@material/web@1.5.1/",
+    "@material/material-color-utilities": "https://unpkg.com/@material/material-color-utilities@0.2.7/index.js",
+    "tslib": "https://unpkg.com/tslib@2.6.3/tslib.es6.js"
+  }
+}
+</script>
+
+
     <script type="module" src="{{ url_for('static', filename='js/main.js') }}"></script>
+
+    <script type="module" src="https://unpkg.com/@material/web/button/filled-tonal-button.js?module"></script>
+    <script type="module" src="https://unpkg.com/@material/web/button/text-button.js?module"></script>
 <style>
   @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
   @keyframes cardEntry { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
-
-  body {
-    font-family: 'Roboto', sans-serif;
-    margin: 0;
-    background-color: var(--md-sys-color-background);
-    color: var(--md-sys-color-on-background);
-    transition: background-color 0.3s, color 0.3s;
-    /* --- Liquid Glass Enhancement --- */
-    /* Add a subtle gradient background for the glass effect to interact with */
-    background-image: radial-gradient(circle at top right, var(--md-sys-color-primary-container), transparent 60%);
-    background-attachment: fixed;
-  }
-  .main-container {
-    width: 100%;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 1.5rem;
-    box-sizing: border-box;
-    animation: fadeIn 0.6s ease-out;
-  }
-  .app-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 3rem;
-    /* --- Liquid Glass Effect --- */
-    padding: 1rem 1.5rem;
-    border-radius: 24px;
-    background-color: rgba(from var(--md-sys-color-surface-container) r g b / 0.6); /* Semi-transparent background */
-    backdrop-filter: blur(16px); /* The frosted glass effect */
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(from var(--md-sys-color-outline-variant) r g b / 0.3); /* Subtle border */
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-  }
+  body { font-family: 'Roboto', sans-serif; margin: 0; background-color: var(--md-sys-color-background); color: var(--md-sys-color-on-background); transition: background-color 0.3s, color 0.3s; }
+  body::before { content: ''; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; background-image: radial-gradient(circle at top right, var(--md-sys-color-primary-container), transparent 60%); background-attachment: fixed; }
+  .main-container { width: 100%; max-width: 1200px; margin: 0 auto; padding: 1.5rem; padding-top: 130px; box-sizing: border-box; animation: fadeIn 0.6s ease-out; }
+  .app-header { display: flex; justify-content: space-between; align-items: center; padding: 1rem 1.5rem; border-radius: 24px; background-color: rgba(from var(--md-sys-color-surface-container) r g b / 0.6); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(from var(--md-sys-color-outline-variant) r g b / 0.3); box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1); position: sticky; top: 1.5rem; z-index: 10; margin-bottom: 3rem; }
   .logo { color: var(--md-sys-color-primary); }
-  .logo h1 { margin: 0; font-family: 'Lobster', cursive; font-size: 3rem; }
-  .logo p { margin: 0; font-size: 1rem; opacity: 0.8; }
+  .logo h1 { margin: 0; font-family: 'Lobster', cursive; font-size: 2.5rem; }
+  .logo p { margin: 0; font-size: 0.9rem; opacity: 0.8; }
   .controls { display: flex; align-items: center; gap: 0.5rem; }
-  .category-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 1.5rem;
-  }
-  .category-card {
-    text-decoration: none;
-    color: var(--md-sys-color-on-surface);
-    padding: 2rem 1.5rem;
-    text-align: center;
-    font-size: 1.25rem;
-    font-weight: 500;
-    transition: transform 0.2s ease, box-shadow 0.2s ease, border-radius 0.2s ease;
-    animation: cardEntry 0.5s ease-out backwards;
-    
-    /* --- Liquid Glass Effect --- */
-    background-color: rgba(from var(--md-sys-color-surface-container-high) r g b / 0.5); /* Semi-transparent background */
-    backdrop-filter: blur(16px); /* The frosted glass effect */
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(from var(--md-sys-color-outline-variant) r g b / 0.2); /* Subtle edge highlight */
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-    border-radius: 24px 8px 24px 8px; /* More expressive border radius */
-  }
+  .controls md-icon-button { --md-icon-button-icon-color: var(--md-sys-color-on-surface-variant); }
+  .category-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1.5rem; }
+  .category-card { text-decoration: none; color: var(--md-sys-color-on-surface); padding: 2rem 1.5rem; text-align: center; font-size: 1.25rem; font-weight: 500; transition: all 0.2s ease; animation: cardEntry 0.5s ease-out backwards; background-color: rgba(from var(--md-sys-color-surface-container-high) r g b / 0.5); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(from var(--md-sys-color-outline-variant) r g b / 0.2); box-shadow: 0 4px 12px rgba(0,0,0,0.05); border-radius: 24px 8px 24px 8px; }
   {% for i in range(categories|length) %}
   .category-card:nth-child({{ i+1 }}) { animation-delay: {{ (i * 0.05) }}s; }
   {% endfor %}
-
-  .category-card:hover {
-    transform: translateY(-5px) scale(1.02);
-    box-shadow: 0 8px 24px rgba(0,0,0,0.1);
-    border-radius: 8px 24px 8px 24px;
-    background-color: rgba(from var(--md-sys-color-surface-container-high) r g b / 0.7); /* Slightly less transparent on hover */
-  }
+  .category-card:hover { transform: translateY(-5px) scale(1.02); box-shadow: 0 8px 24px rgba(0,0,0,0.1); border-radius: 8px 24px 8px 24px; background-color: rgba(from var(--md-sys-color-surface-container-high) r g b / 0.7); }
   h2 { font-size: 2rem; margin-bottom: 2rem; text-align: center; font-family: 'Lobster', cursive; }
-  @media (max-width: 600px) {
-    .app-header { flex-direction: column; align-items: center; gap: 1.5rem; text-align: center; }
-    .main-container { padding: 1rem; }
-    h2 { font-size: 1.75rem; }
+  @media (max-width: 768px) {
+    .main-container { padding-top: 180px; }
+    .app-header { flex-direction: column; align-items: center; gap: 1.5rem; text-align: center; top: 1rem; margin-bottom: 2rem; }
   }
 </style>
-
 </head>
 <body>
     <div class="main-container">
         <header class="app-header">
           <div class="logo"><h1>NewsOShort</h1><p>Your news, elegantly summarized.</p></div>
           <div class="controls">
+            {% if username %}
+              <md-filled-tonal-button href="{{ url_for('for_you') }}">For You</md-filled-tonal-button>
+              <md-text-button href="{{ url_for('bookmarks') }}">Bookmarks</md-text-button>
+              <md-text-button href="{{ url_for('logout') }}">Logout</md-text-button>
+            {% else %}
+              <md-filled-tonal-button href="{{ url_for('login') }}">Login</md-filled-tonal-button>
+              <md-text-button href="{{ url_for('register') }}">Register</md-text-button>
+            {% endif %}
             <label for="color-picker" style="cursor: pointer; display: flex; align-items: center; padding: 0.5rem;">
                 <span class="material-symbols-outlined">palette</span>
             </label>

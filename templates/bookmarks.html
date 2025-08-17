@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Manage Bookmarks</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lobster&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+   <script type="importmap">
+{
+  "imports": {
+    "lit": "https://unpkg.com/lit@3.1.4/index.js",
+    "lit/": "https://unpkg.com/lit@3.1.4/",
+    "lit-html": "https://unpkg.com/lit-html@3.1.4/lit-html.js",
+    "lit-html/": "https://unpkg.com/lit-html@3.1.4/",
+    "lit-element": "https://unpkg.com/lit-element@4.0.6/lit-element.js",
+    "lit-element/": "https://unpkg.com/lit-element@4.0.6/",
+    "@lit/reactive-element": "https://unpkg.com/@lit/reactive-element@2.0.4/reactive-element.js",
+    "@lit/reactive-element/": "https://unpkg.com/@lit/reactive-element@2.0.4/",
+    "@material/web/": "https://unpkg.com/@material/web@1.5.1/",
+    "@material/material-color-utilities": "https://unpkg.com/@material/material-color-utilities@0.2.7/index.js",
+    "tslib": "https://unpkg.com/tslib@2.6.3/tslib.es6.js"
+  }
+}
+</script>
+
+    <script type="module" src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <style>
+      /* Styles are identical to index.html, with these additions */
+      @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+      body { font-family: 'Roboto', sans-serif; margin: 0; background-color: var(--md-sys-color-background); color: var(--md-sys-color-on-background); }
+      body::before { content: ''; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; background-image: radial-gradient(circle at top right, var(--md-sys-color-primary-container), transparent 60%); background-attachment: fixed; }
+      .main-container { width: 100%; max-width: 1200px; margin: 0 auto; padding: 1.5rem; padding-top: 130px; box-sizing: border-box; animation: fadeIn 0.6s ease-out; }
+      .app-header { display: flex; justify-content: space-between; align-items: center; padding: 1rem 1.5rem; border-radius: 24px; background-color: rgba(from var(--md-sys-color-surface-container) r g b / 0.6); backdrop-filter: blur(16px); border: 1px solid rgba(from var(--md-sys-color-outline-variant) r g b / 0.3); position: sticky; top: 1.5rem; z-index: 10; margin-bottom: 3rem; }
+      .logo h1 { margin: 0; font-family: 'Lobster', cursive; font-size: 2.5rem; color: var(--md-sys-color-primary); }
+      .logo p { margin: 0; font-size: 0.9rem; opacity: 0.8; }
+      h2 { font-size: 2rem; margin-bottom: 2rem; text-align: center; font-family: 'Lobster', cursive; }
+      .category-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1.5rem; }
+      .category-card { cursor: pointer; text-decoration: none; color: var(--md-sys-color-on-surface); padding: 2rem 1.5rem; text-align: center; font-size: 1.25rem; font-weight: 500; transition: all 0.2s ease; background-color: rgba(from var(--md-sys-color-surface-container-high) r g b / 0.5); backdrop-filter: blur(16px); border: 2px solid rgba(from var(--md-sys-color-outline-variant) r g b / 0.2); border-radius: 24px 8px 24px 8px; }
+      .category-card.bookmarked {
+        border-color: var(--md-sys-color-primary);
+        color: var(--md-sys-color-primary);
+        transform: scale(1.02);
+      }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <header class="app-header">
+            <div class="logo"><h1>Bookmarks</h1><p>Tap a category to add or remove it from your "For You" feed.</p></div>
+            <a href="{{ url_for('index') }}" style="text-decoration: none;">
+                <md-filled-tonal-button>Done</md-filled-tonal-button>
+            </a>
+        </header>
+        <main>
+            <div class="category-grid">
+                {% for cat in all_categories %}
+                  <div class="category-card {% if cat in user_bookmarks %}bookmarked{% endif %}" data-category="{{ cat }}">
+                    {{ cat }}
+                  </div>
+                {% endfor %}
+            </div>
+        </main>
+    </div>
+
+    <script type="module">
+        document.querySelector('.category-grid').addEventListener('click', async (event) => {
+            const card = event.target.closest('.category-card');
+            if (!card) return;
+            const category = card.dataset.category;
+            
+            const response = await fetch('/api/toggle_bookmark', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ category: category })
+            });
+
+            if (response.ok) {
+                card.classList.toggle('bookmarked');
+            }
+        });
+    </script>
+</body>
+</html>

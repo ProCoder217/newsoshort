@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Register - NewsOShort</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lobster&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<script type="importmap">
+{
+  "imports": {
+    "lit": "https://unpkg.com/lit@3.1.4/index.js",
+    "lit/": "https://unpkg.com/lit@3.1.4/",
+    "lit-html": "https://unpkg.com/lit-html@3.1.4/lit-html.js",
+    "lit-html/": "https://unpkg.com/lit-html@3.1.4/",
+    "lit-element": "https://unpkg.com/lit-element@4.0.6/lit-element.js",
+    "lit-element/": "https://unpkg.com/lit-element@4.0.6/",
+    "@lit/reactive-element": "https://unpkg.com/@lit/reactive-element@2.0.4/reactive-element.js",
+    "@lit/reactive-element/": "https://unpkg.com/@lit/reactive-element@2.0.4/",
+    "@material/web/": "https://unpkg.com/@material/web@1.5.1/",
+    "@material/material-color-utilities": "https://unpkg.com/@material/material-color-utilities@0.2.7/index.js",
+    "tslib": "https://unpkg.com/tslib@2.6.3/tslib.es6.js"
+  }
+}
+</script>
+
+    <script type="module" src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script type="module" src="https://unpkg.com/@material/web/textfield/outlined-text-field.js?module"></script>
+    <script type="module" src="https://unpkg.com/@material/web/button/filled-button.js?module"></script>
+    <style>
+        /* Styles are identical to login.html */
+        body { font-family: 'Roboto', sans-serif; margin: 0; background-color: var(--md-sys-color-background); color: var(--md-sys-color-on-background); display: grid; place-items: center; min-height: 100vh; background-image: radial-gradient(circle at top right, var(--md-sys-color-primary-container), transparent 60%); background-attachment: fixed; }
+        .form-container { width: 100%; max-width: 400px; padding: 2.5rem; box-sizing: border-box; background-color: rgba(from var(--md-sys-color-surface-container) r g b / 0.6); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(from var(--md-sys-color-outline-variant) r g b / 0.3); border-radius: 28px; text-align: center; }
+        .logo { color: var(--md-sys-color-primary); font-family: 'Lobster', cursive; font-size: 3rem; margin-bottom: 2rem; }
+        form { display: flex; flex-direction: column; gap: 1.5rem; }
+        md-filled-button { --md-filled-button-container-height: 52px; }
+        .link { margin-top: 1.5rem; font-size: 0.9rem; }
+        .link a { color: var(--md-sys-color-primary); text-decoration: none; }
+        .error { color: var(--md-sys-color-error); margin-bottom: 1rem; }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <h1 class="logo">NewsOShort</h1>
+        {% if error %}
+          <p class="error">{{ error }}</p>
+        {% endif %}
+        <form method="POST" action="{{ url_for('register') }}">
+            <md-outlined-text-field label="Username" name="username" required></md-outlined-text-field>
+            <md-outlined-text-field type="password" label="Password" name="password" required></md-outlined-text-field>
+            <md-filled-button type="submit">Register</md-filled-button>
+        </form>
+        <p class="link">Already have an account? <a href="{{ url_for('login') }}">Login</a></p>
+    </div>
+</body>
+</html>
